@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebScan AI – Deep Website Analyzer</title>
+  <meta name="description" content="Paste any URL and let AI analyze every asset, link, font, script, and security detail of any website." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Hero / Input Screen -->
+  <div id="homeScreen" class="screen active">
+    <div class="bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <header class="hero-header">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">WebScan<span class="logo-accent">AI</span></span>
+      </div>
+    </header>
+    <main class="hero-main">
+      <h1 class="hero-title">
+        <span class="line1">Deep-Scan</span>
+        <span class="line2">Any Website.</span>
+      </h1>
+      <p class="hero-sub">Paste a URL and our AI will extract every link, asset, font, script, security flag, and more — in seconds.</p>
+      <div class="url-form" id="urlForm">
+        <div class="input-wrap">
+          <span class="input-icon">🔗</span>
+          <input
+            type="url"
+            id="urlInput"
+            placeholder="https://example.com"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="scanBtn" class="scan-btn">
+            <span class="btn-text">Scan</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+        <p class="input-hint">Works with any publicly accessible URL</p>
+      </div>
+      <div id="errorMsg" class="error-msg hidden"></div>
+    </main>
+    <div class="grid-lines"></div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="screen hidden">
+    <div class="bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+    <div class="loader-container">
+      <div class="scanner-ring">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="scanner-dot"></div>
+      </div>
+      <h2 class="loader-title">Scanning <span id="scanningUrl" class="loader-url"></span></h2>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="asset-counter-grid" id="assetCounterGrid">
+        <div class="asset-counter" data-key="links"><span class="ac-num" id="cnt-links">0</span><span class="ac-label">Links</span></div>
+        <div class="asset-counter" data-key="images"><span class="ac-num" id="cnt-images">0</span><span class="ac-label">Images</span></div>
+        <div class="asset-counter" data-key="scripts"><span class="ac-num" id="cnt-scripts">0</span><span class="ac-label">Scripts</span></div>
+        <div class="asset-counter" data-key="styles"><span class="ac-num" id="cnt-styles">0</span><span class="ac-label">Stylesheets</span></div>
+        <div class="asset-counter" data-key="fonts"><span class="ac-num" id="cnt-fonts">0</span><span class="ac-label">Fonts</span></div>
+        <div class="asset-counter" data-key="meta"><span class="ac-num" id="cnt-meta">0</span><span class="ac-label">Meta Tags</span></div>
+        <div class="asset-counter" data-key="iframes"><span class="ac-num" id="cnt-iframes">0</span><span class="ac-label">Iframes</span></div>
+        <div class="asset-counter" data-key="flags"><span class="ac-num" id="cnt-flags">0</span><span class="ac-label">Security Flags</span></div>
+      </div>
+      <div class="loader-log" id="loaderLog"></div>
+    </div>
+  </div>
+
+  <!-- Results Screen -->
+  <div id="resultsScreen" class="screen hidden">
+    <div class="results-header">
+      <div class="results-logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">WebScan<span class="logo-accent">AI</span></span>
+      </div>
+      <div class="results-meta">
+        <span id="resultUrl" class="result-url-badge"></span>
+        <button id="newScanBtn" class="new-scan-btn">← New Scan</button>
+      </div>
+    </div>
+
+    <!-- AI Summary bar -->
+    <div class="ai-summary-bar" id="aiSummaryBar">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-text" id="aiSummaryText">Generating AI analysis…</div>
+      <button class="ai-explain-btn" id="aiExplainBtn">Step-by-Step Explanation ▼</button>
+    </div>
+
+    <!-- AI Step-by-Step Explainer (collapsible) -->
+    <div class="ai-steps-panel hidden" id="aiStepsPanel">
+      <div class="ai-steps-inner" id="aiStepsInner">
+        <div class="ai-step-loading">
+          <div class="dot-loader"><span></span><span></span><span></span></div>
+          <p>Generating detailed walkthrough…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="links">Links</button>
+      <button class="tab-btn" data-tab="assets">Assets</button>
+      <button class="tab-btn" data-tab="fonts">Fonts</button>
+      <button class="tab-btn" data-tab="meta">Meta & SEO</button>
+      <button class="tab-btn" data-tab="security">Security</button>
+      <button class="tab-btn" data-tab="tech">Tech Stack</button>
+      <button class="tab-btn" data-tab="raw">Raw HTML</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content-wrap" id="tabContentWrap">
+      <div class="tab-panel active" id="tab-overview"></div>
+      <div class="tab-panel" id="tab-links"></div>
+      <div class="tab-panel" id="tab-assets"></div>
+      <div class="tab-panel" id="tab-fonts"></div>
+      <div class="tab-panel" id="tab-meta"></div>
+      <div class="tab-panel" id="tab-security"></div>
+      <div class="tab-panel" id="tab-tech"></div>
+      <div class="tab-panel" id="tab-raw"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
